@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <style>
+      .app {
+        width: 600px;
+        height: 500px;
+        margin: 0 auto;
+        background-color: rgb(13, 235, 235);
+        padding: 10px 50px 50px 50px;
+        border: 2px solid black;
+      }
+      .buttons {
+        background-color: rgb(88, 176, 231);
+        color: white;
+        padding: 20px;
+        border-radius: 50px;
+      }
+      button {
+        padding: 20px;
+        grid-template-columns: auto;
+        margin-left: 70px;
+        background-color: blueviolet;
+        font-size: 20px;
+      }
+      #question {
+        font-size: 40px;
+        color: red;
+        text-shadow: 2px 3px 2px yellow;
+      }
+      #progress {
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div id="quiz">
+        <h1>Quiz App</h1>
+
+        <p id="question"></p>
+
+        <div class="buttons">
+          <button id="btn0"><span id="choice0"></span></button>
+          <button id="btn1"><span id="choice1"></span></button>
+          <button id="btn2"><span id="choice2"></span></button>
+          <button id="btn3"><span id="choice3"></span></button>
+        </div>
+
+        <p id="progress">Question x of y</p>
+      </div>
+    </div>
+
+    <script>
+      // Step 1 : Setting up the question
+      function Question(text, choices, answer) {
+        this.text = text;
+        this.choices = choices;
+        this.answer = answer;
+      }
+
+      function shuffle(array) {
+        let counter = array.length; //6
+
+        // While there are elements in the array
+        while (counter > 0) {
+          // Pick a random index
+          let index = Math.floor(Math.random() * counter); //3
+          console.log(index);
+
+          // Decrease counter by 1
+          counter--; //2
+
+          // And swap the last element with it
+          let temp = array[counter];
+          array[counter] = array[index];
+          array[index] = temp;
+        }
+
+        return array;
+      }
+
+      var questions_withoutShuffle = [
+        //question Array
+        new Question("capital letter ?", ["a", "b", "c", "D"], "D"),
+        new Question("2 + 4 = ?", ["2", "4", "6", "2"], "6"),
+        new Question("4 x 2 = ?", [" 2", "4", "8", "6"], "8"),
+        new Question("10 - 5 = ?", ["2", "3", "4", "5"], "5"),
+        new Question("8 + 2 = ?", ["2 ", " 8", "10", "12"], "10"),
+        new Question("2 + 1 = ?", ["1", "2", "3", "4"], "3"),
+        new Question("small letter= ?", ["a", "B", "C", "D"], "a"),
+        new Question("small letter= ?", ["B", "b", "C", "D"], "b")
+      ];
+
+      var questions = shuffle(questions_withoutShuffle);
+
+      //Step 2 : Setting and create up the quiz Application
+
+      function Quiz(questions) {
+        this.score = 0;
+        this.questions = questions;
+        this.questionIndex = 0;
+      }
+
+      // create quiz
+      var quiz = new Quiz(questions);
+
+      //Step 3 : Display the quiz questions
+      // display quiz
+
+      function display() {
+        if (quiz.questions.length == quiz.questionIndex) {
+          showScores();
+        } else {
+          // show question based on question index
+          var element = document.getElementById("question");
+          element.innerHTML = quiz.questions[quiz.questionIndex].text;
+
+          // show options based on question index
+          var choices = quiz.questions[quiz.questionIndex].choices;
+          for (var i = 0; i < choices.length; i++) {
+            var element = document.getElementById("choice" + i);
+            element.innerHTML = choices[i];
+            guess("btn" + i, choices[i]);
+          }
+
+          //next question
+          var currentQuestionNumber = quiz.questionIndex + 1;
+          var element = document.getElementById("progress");
+          element.innerHTML =
+            "Question " +
+            currentQuestionNumber +
+            " of " +
+            quiz.questions.length;
+        }
+      }
+
+      display();
+
+      function guess(id, guess) {
+        var button = document.getElementById(id);
+        button.onclick = function () {
+          quiz.guess(guess);
+          display();
+        };
+      }
+
+      Quiz.prototype.getQuestionIndex = function () {
+        return this.questions[this.questionIndex];
+      };
+
+      Quiz.prototype.guess = function (answer) {
+        if (this.getQuestionIndex().isCorrectAnswer(answer)) {
+          this.score++;
+        }
+
+        this.questionIndex++;
+      };
+
+      Question.prototype.isCorrectAnswer = function (choice) {
+        return this.answer === choice;
+      };
+
+      function showScores() {
+        var gameOverHTML = "<h1>Result</h1>";
+        gameOverHTML += "<h2 id='score'> Your scores: " + quiz.score + "</h2>";
+        var element = document.getElementById("quiz");
+        element.innerHTML = gameOverHTML;
+      }
+    </script>
+  </body>
+</html>
